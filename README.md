@@ -29,7 +29,7 @@ Therefore, the script has created a version with string question IDs in `data/da
 
 Now you can run the GreenCovidSQuADBERT model:
 ```bash
-python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/GreenCovidSQuADBERT --embeddingprefix data/cord-19
+python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/GreenCovidSQuADBERT --embeddingprefix data/cord-19 --batch_size 128
 ```
 
 The script saves its predictions in the `data` directory.
@@ -52,7 +52,7 @@ The output should look like this:
 
 Now run and evaluate the baseline SQuADBERT model, without aligned Word2Vec vectors:
 ```bash
-python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/SQuADBERT
+python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/SQuADBERT --batch_size 128
 python3 evaluate-v2.0.py data/dataset_fixed_ids.json data/SQuADBERT.predictions.json
 ```
 
