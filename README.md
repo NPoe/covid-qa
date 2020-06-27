@@ -25,16 +25,16 @@ The downloaded files include:
 * the Covid-QA dataset (from 2020-04-23): `data/dataset.json`
 
 The original dataset uses integer question IDs, which breaks the SQuAD scorer.
-Therefore, the script has created a version with string question IDs in `data/dataset\_fixed\_ids.json`.
+Therefore, the script has created a version with string question IDs in `data/dataset_fixed_ids.json`.
 
 Now you can run the GreenCovidSQuADBERT model:
-```console
-python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/GreenCovidSQuADBERT --embeddingprefix data/cord-19
+```bash
+python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/GreenCovidSQuADBERT --embeddingprefix data/cord-19 --batch_size 128
 ```
 
 The script saves its predictions in the `data` directory.
 Evaluate the predictions with the SQuAD scorer:
-```console
+```bash
 python3 evaluate-v2.0.py data/dataset_fixed_ids.json data/GreenCovidSQuADBERT.predictions.json
 ```
 
@@ -51,8 +51,8 @@ The output should look like this:
 ```
 
 Now run and evaluate the baseline SQuADBERT model, without aligned Word2Vec vectors:
-```console
-python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/SQuADBERT
+```bash
+python3 main.py --verbose --infile data/dataset_fixed_ids.json --outprefix data/SQuADBERT --batch_size 128
 python3 evaluate-v2.0.py data/dataset_fixed_ids.json data/SQuADBERT.predictions.json
 ```
 
