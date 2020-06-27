@@ -41,12 +41,12 @@ python3 evaluate-v2.0.py data/dataset_fixed_ids.json data/GreenCovidSQuADBERT.pr
 The output should look like this:
 ```javascript
 {
-  "exact": 32.2463768115942,
-  "f1": 57.0357932641437,
-  "total": 1380,
-  "HasAns_exact": 32.2463768115942,
-  "HasAns_f1": 57.0357932641437,
-  "HasAns_total": 1380
+  "exact": 34.62109955423477,
+  "f1": 60.094416813966,
+  "total": 2019,
+  "HasAns_exact": 34.62109955423477,
+  "HasAns_f1": 60.094416813966,
+  "HasAns_total": 2019
 }
 ```
 
@@ -59,11 +59,11 @@ python3 evaluate-v2.0.py data/dataset_fixed_ids.json data/SQuADBERT.predictions.
 The output should look like this:
 ```javascript
 {
-  "exact": 30.652173913043477,
-  "f1": 55.71489229927696,
-  "total": 1380,
-  "HasAns_exact": 30.652173913043477,
-  "HasAns_f1": 55.71489229927696,
-  "HasAns_total": 1380
+  "exact": 33.03615651312531,
+  "f1": 58.236683765572,
+  "total": 2019,
+  "HasAns_exact": 33.03615651312531,
+  "HasAns_f1": 58.236683765572,
+  "HasAns_total": 2019
 }
 ```

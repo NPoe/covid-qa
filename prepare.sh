@@ -1,5 +1,7 @@
 squadeval_url="https://worksheets.codalab.org/rest/bundles/0x6b567e1cf2e041ec80d7098f031c5c9e/contents/blob/"
-data_url="https://raw.githubusercontent.com/deepset-ai/COVID-QA/master/data/question-answering/200423_covidQA.json"
+data_url="https://raw.githubusercontent.com/deepset-ai/COVID-QA/master/data/question-answering/COVID-QA.json"
+# old version of data: "https://raw.githubusercontent.com/deepset-ai/COVID-QA/master/data/question-answering/200423_covidQA.json" 
+
 cord19_vocab_url="https://www.cis.uni-muenchen.de/~poerner/blobs/covid-qa/cord-19-vocab.txt"
 cord19_vectors_url="https://www.cis.uni-muenchen.de/~poerner/blobs/covid-qa/cord-19-vectors.pt"
 

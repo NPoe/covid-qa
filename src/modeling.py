@@ -112,47 +112,46 @@ class QAModel:
         return outputs.detach().to(device = "cpu")
 
 
-    def get_outputs_at_char_level(self, context):
-        outputs_char = torch.zeros((len(context.questions), len(context.text)+1, len(self.tokenizers), 2)) - float("Inf")
-        
+    def get_outputs_at_word_level(self, context):
         for tokenizer_i, tokenizer in enumerate(self.tokenizers):
             outputs = self.get_outputs_at_token_level(context, tokenizer)
+            
+            if tokenizer_i == 0:
+                outputs_word = torch.zeros((len(context.questions), len(context.word2start_char), len(self.tokenizers), 2)) - float("Inf")
 
             for token_i in range(outputs.shape[1]):
-                for dim_i, mapping in enumerate((context.token2start, context.token2end)):
-                    char_position = mapping[id(tokenizer)][token_i]
+                word_i = context.token2word[id(tokenizer)][token_i]
 
-                    outputs_char[:, char_position, tokenizer_i, dim_i] = torch.max(\
-                            outputs_char[:, char_position, tokenizer_i, dim_i], 
+                for dim_i in range(2):
+                    outputs_word[:, word_i, tokenizer_i, dim_i] = torch.max(\
+                            outputs_word[:, word_i, tokenizer_i, dim_i], 
                             outputs[:, token_i, dim_i])
 
-        return outputs_char.mean(axis = 2) # (questions, char_len, 2)
+        return outputs_word.mean(axis = 2) # (questions, word_len, 2)
 
 
     def get_best_scores_and_answers(self, context):
-        scores = self.get_outputs_at_char_level(context)
+        scores_word = self.get_outputs_at_word_level(context)
         best_scores, best_answers = [], []
 
         for question_i, question in enumerate(context.questions):
             current_best_scores = [-float("Inf") for _ in range(self.num_nbest)]
             current_best_answers = [None for _ in range(self.num_nbest)]
         
-            max_end_score = scores[question_i,:,1].max()
+            max_end_score = scores_word[question_i,:,1].max()
         
-            for start in range(scores.shape[1]):
-                start_score = scores[question_i, start, 0]
+            for start in range(scores_word.shape[1]):
+                start_score = scores_word[question_i, start, 0]
             
                 if start_score + max_end_score > current_best_scores[-1]:
-                    k = min(self.num_nbest, scores.shape[1] - start - 1)
-                    if k == 0: continue
-                
-                    topk = torch.topk(scores[question_i, start+1:start+1+self.max_answer_chars, 1], k=k)
-                
-                    for score, end in zip(topk[0] + start_score, topk[1] + start + 1):
+                    max_end = (context.word2start_char[start]-context.word2end_char[start:]+self.max_answer_chars >= 0).nonzero()[-1][0] + start
+
+                    topk = torch.topk(scores_word[question_i, start:max_end+1, 1], k=min(self.num_nbest, max_end-start+1))
+                    for score, end in zip(topk[0] + start_score, topk[1] + start):
                         score = score.item()
 
                         if score > current_best_scores[-1]:
-                            answer = context.text[start:end]
+                            answer = context.text[context.word2start_char[start]:context.word2end_char[end]]
                             delpos = current_best_answers.index(answer) if answer in current_best_answers else -1
                         
                             if score > current_best_scores[delpos]:

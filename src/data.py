@@ -61,21 +61,26 @@ class QAItem:
         self.uid = uid
         self.text = text
         self.tokens = {}
-        self.token2start = {}
-        self.token2end = {}
+        self.token2word = {}
+
+        self.word2start_char = []
+        self.word2end_char = []
 
     def __hash__(self):
         return id(self)
 
     def add_tokenizer(self, tokenizer):
+        assert not id(tokenizer) in self.tokens
+
         self.tokens[id(tokenizer)] = []
-        self.token2start[id(tokenizer)] = []
-        self.token2end[id(tokenizer)] = []
+        self.token2word[id(tokenizer)] = []
         
         text_pos = 0
+        word_counter = 0
 
         whitespace_rgx = re.compile("([" + string.whitespace + "]+)")
         punct_rgx = re.compile("([" + string.punctuation + "]+)")
+
 
         for whitespace_token in whitespace_rgx.split(self.text):
             if whitespace_rgx.match(whitespace_token) or len(whitespace_token) == 0:
@@ -83,19 +88,30 @@ class QAItem:
                 
             else:
                 for token in punct_rgx.split(whitespace_token):
-                    if len(token) == 0: continue
-                    text_pos += len(token)
+                    if len(token) == 0: 
+                        continue
 
                     wordpieces = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(token))
                     self.tokens[id(tokenizer)].extend(wordpieces)
-                    self.token2start[id(tokenizer)].extend([text_pos - len(token)] * len(wordpieces))
-                    self.token2end[id(tokenizer)].extend([text_pos] * len(wordpieces))
+                    self.token2word[id(tokenizer)].extend([word_counter] * len(wordpieces))
+                    
+                    if len(self.tokens.keys()) == 1:
+                        self.word2start_char.append(text_pos)
+                        self.word2end_char.append(text_pos + len(token))
+                    else:
+                        assert self.word2start_char[word_counter] == text_pos
+                        assert self.word2end_char[word_counter] == text_pos + len(token)
 
-        self.token2start[id(tokenizer)] = torch.tensor(self.token2start[id(tokenizer)]) 
-        self.token2end[id(tokenizer)] = torch.tensor(self.token2end[id(tokenizer)]) 
+                    text_pos += len(token)
+                    word_counter += 1
+
+        if len(self.tokens.keys()) == 1:
+            self.word2start_char = torch.tensor(self.word2start_char) 
+            self.word2end_char = torch.tensor(self.word2end_char) 
+
+        self.token2word[id(tokenizer)] = torch.tensor(self.token2word[id(tokenizer)])
 
         assert text_pos == len(self.text)
-        assert len(self.text[text_pos:].strip()) == 0
 
 
 class QAContext(QAItem):
